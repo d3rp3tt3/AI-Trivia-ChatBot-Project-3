@@ -2,7 +2,7 @@ import csv
 import sqlite3
 
 # Connect to SQLite database
-conn = sqlite3.connect('trivia_qa.db')
+conn = sqlite3.connect('../app/trivia_qa.db')
 cursor = conn.cursor()
 
 # Create table if it doesn't exist

@@ -1,7 +1,7 @@
 import sqlite3
 
 # Connect to the SQLite database
-conn = sqlite3.connect('../data/prod/trivia_qa.db')
+conn = sqlite3.connect('../app/trivia_qa.db')
 cursor = conn.cursor()
 
 # Run a SELECT query
