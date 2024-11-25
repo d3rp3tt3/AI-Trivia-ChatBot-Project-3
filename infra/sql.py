@@ -2,29 +2,32 @@ import csv
 import sqlite3
 
 # Connect to SQLite database
-conn = sqlite3.connect('mydatabase.db')
+conn = sqlite3.connect('trivia_qa.db')
 cursor = conn.cursor()
 
 # Create table if it doesn't exist
 cursor.execute('''
-    CREATE TABLE IF NOT EXISTS mytable (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+    CREATE TABLE IF NOT EXISTS jeopardy (
+        ShowNumber int,
+        AirDate date,
+        Round TEXT,
         Category TEXT,
+        Value int,
         Question TEXT,
         Answer TEXT
     )
 ''')
 
 # Read CSV file and insert data into table
-with open('data.csv', 'r', newline='') as csvfile:
+with open('../JEOPARDY_CSV_TOP3_Categories.csv', 'r', newline='') as csvfile:
     reader = csv.DictReader(csvfile)
 
     # Insert data
     for row in reader:
         cursor.execute('''
-            INSERT INTO mytable (Category, Question, Answer)
-            VALUES (?, ?, ?)
-        ''', (row['Category'], row['Question'], row['Answer']))
+            INSERT INTO jeopardy (ShowNumber, AirDate, Round, Category, Value, Question, Answer)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ''', (row['ShowNumber'], row['AirDate'], row['Round'], row['Category'], row['Value'], row['Question'], row['Answer']))
 
 # Commit changes and close connection
 conn.commit()

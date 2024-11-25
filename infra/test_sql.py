@@ -1,22 +1,26 @@
 import sqlite3
 
 # Connect to the SQLite database
-conn = sqlite3.connect('mydatabase.db')
+conn = sqlite3.connect('trivia_qa.db')
 cursor = conn.cursor()
 
 # Run a SELECT query
 cursor.execute('''
-    SELECT Category, Question, Answer 
-    FROM mytable 
-    LIMIT 5
+    SELECT ShowNumber, AirDate, Round, Category, Value, Question, Answer 
+    FROM jeopardy 
+    LIMIT 7
 ''')
 
 # Fetch and display the results
 results = cursor.fetchall()
 for row in results:
-    print(f"Category: {row[0]}")
-    print(f"Question: {row[1]}")
-    print(f"Answer: {row[2]}")
+    print(f"ShowNumber: {row[0]}")
+    print(f"AirDate: {row[1]}")
+    print(f"Round: {row[2]}")
+    print(f"Category: {row[3]}")
+    print(f"Value: {row[4]}")
+    print(f"Question: {row[5]}")
+    print(f"Answer: {row[6]}")
     print("---")
 
 # Close the connection
