@@ -14,8 +14,12 @@ cursor.execute('''
         Category TEXT,
         Value int,
         Question TEXT,
+<<<<<<< HEAD
         Answer TEXT,
         MockHumanAnswer TEXT
+=======
+        Answer TEXT
+>>>>>>> 76a6ac1 (Add test db and verification)
     )
 ''')
 
