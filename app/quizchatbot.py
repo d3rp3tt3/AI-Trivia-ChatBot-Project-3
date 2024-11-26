@@ -47,7 +47,7 @@ class QuizChatbot:
     def verify_answer(self, user_answer: str, correct_answer: str) -> bool:
         """Use the LLM to verify if the answer is correct"""
         prompt = ChatPromptTemplate.from_messages([
-            SystemMessage(content="""You are an answer verification expert. 
+            SystemMessage(content="""You are a trivia gameshow host for a question and answer style trivia game. 
             Compare the user's answer with the correct answer and determine if they are semantically equivalent.
             You will accept answers that include misspellings and grammar problems. Rather than determining
             if the answer exactly matches the answer from the trivia database, you will act
