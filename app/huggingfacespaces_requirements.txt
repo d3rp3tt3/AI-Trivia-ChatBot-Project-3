@@ -1,0 +1,6 @@
+huggingface_hub==0.25.2
+langchain_ollama
+langchain
+huggingface_hub
+langchain_huggingface
+langchain_mistralai
