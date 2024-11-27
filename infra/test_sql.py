@@ -20,7 +20,7 @@ cursor.execute('''
 ''')
 
 # Read CSV file and insert data into table
-with open('../app/mock_data.csv', 'r', newline='') as csvfile:
+with open('../data/test/mock_data.csv', 'r', newline='') as csvfile:
     reader = csv.DictReader(csvfile)
 
     # Insert data
