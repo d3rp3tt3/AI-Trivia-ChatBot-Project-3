@@ -15,6 +15,7 @@ cursor.execute('''
         Value int,
         Question TEXT,
         Answer TEXT,
+        MockHumanAnswer TEXT,
         MockHumanAnswer TEXT
         Answer TEXT,
         MockHumanAnswer TEXT
