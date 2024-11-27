@@ -6,7 +6,7 @@ cursor = conn.cursor()
 
 # Run a SELECT query
 cursor.execute('''
-    SELECT ShowNumber, AirDate, Round, Category, Value, Question, Answer 
+    SELECT ShowNumber, AirDate, Round, Category, Value, Question, Answer, MockHumanAnswer
     FROM jeopardy 
     LIMIT 7
 ''')
@@ -21,6 +21,7 @@ for row in results:
     print(f"Value: {row[4]}")
     print(f"Question: {row[5]}")
     print(f"Answer: {row[6]}")
+    print(f"MockHumanAnswer: {row[7]}")
     print("---")
 
 # Close the connection
