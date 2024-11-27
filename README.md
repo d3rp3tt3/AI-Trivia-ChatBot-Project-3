@@ -31,10 +31,10 @@ This project depends on these technologies and modules:
     conda env create --name <my-env>
     ```
 
-    **Pyenv**
+    **Python virtual environment**
 
     ```sh
-    python3 -m venv venv
+    python3 -m venv <my-venv>
     source venv/bin/activate  # On Windows use `venv\Scripts\activate`
     ```
 
