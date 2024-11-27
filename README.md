@@ -4,6 +4,64 @@
 
 We will create a chatbot with which a person can interact to play a simple trivia game. The bot will use an established lightweight LLM model and reference a large dataset of questions via Retrieval-Augmented Generation (RAG). We’ll include agentful workflows programmed via prompt engineering and chaining with LangChain.
 
+## Installation
+
+This project depends on these technologies and modules:
+
+* Ollama
+* phi3:3.8b model from ChatOllama
+* Python 3.10 or greater
+* LangChain (LLM agent interface)
+* Gradio (user interface)
+* sqlite3
+* Pandas
+
+1. **Clone the repository:**
+
+    ```sh
+    git clone https://github.com/d3rp3tt3/AI-Trivia-ChatBot-Project-3.git
+    cd AI-Trivia-ChatBot-Project-3
+    ```
+
+2. **Create a virtual environment (optional but recommended):**
+
+    **Conda**
+
+    ```sh
+    conda env create --name <my-env>
+    ```
+
+    **Pyenv**
+
+    ```sh
+    python3 -m venv venv
+    source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+    ```
+
+3. **Install the required packages:**
+
+    ```sh
+    pip install -r requirements.txt
+    ```
+
+4. **Install Ollama:**
+
+    Follow the instructions on the [Ollama website](https://ollama.com) to install Ollama.
+
+5. **Pull the phi3:3.8b model:**
+
+    After installing Ollama, pull the `phi3:3.8b` model by running:
+
+    ```sh
+    ollama pull phi3:3.8b
+    ```
+
+6. **Run the application:**
+
+    ```sh
+    python local_quizchatbot.py
+    ```
+
 ## Methodology
 
 ### Tools and libraries
