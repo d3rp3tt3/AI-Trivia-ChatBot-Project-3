@@ -16,18 +16,13 @@ cursor.execute('''
         Question TEXT,
         Answer TEXT,
         MockHumanAnswer TEXT
-<<<<<<< HEAD
         Answer TEXT,
         MockHumanAnswer TEXT
-=======
-        Answer TEXT
->>>>>>> 76a6ac1 (Add test db and verification)
     )
 ''')
 
 # Read CSV file and insert data into table
 with open('../app/mock_data.csv', 'r', newline='') as csvfile:
-with open('../data/test/mock_data.csv', 'r', newline='') as csvfile:
     reader = csv.DictReader(csvfile)
 
     # Insert data
