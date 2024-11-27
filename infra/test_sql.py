@@ -9,7 +9,7 @@ cursor = conn.cursor()
 cursor.execute('''
     CREATE TABLE IF NOT EXISTS jeopardy (
         ShowNumber int,
-        AirDate date,
+        AirDate TEXT,
         Round TEXT,
         Category TEXT,
         Value int,
