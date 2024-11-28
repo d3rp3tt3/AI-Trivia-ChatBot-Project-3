@@ -1,29 +1,37 @@
+import csv
 import sqlite3
 
-# Connect to the SQLite database
-conn = sqlite3.connect('../app/trivia_qa.db')
+# Connect to SQLite database
+conn = sqlite3.connect('../app/testing_trivia_qa.db')
 cursor = conn.cursor()
 
-# Run a SELECT query
+# Create table if it doesn't exist
 cursor.execute('''
-    SELECT ShowNumber, AirDate, Round, Category, Value, Question, Answer 
-    FROM jeopardy 
-    LIMIT 7
+    CREATE TABLE IF NOT EXISTS jeopardy (
+        ShowNumber int,
+        AirDate date,
+        Round TEXT,
+        Category TEXT,
+        Value int,
+        Question TEXT,
+        Answer TEXT,
+        MockHumanAnswer TEXT
+    )
 ''')
 
-# Fetch and display the results
-results = cursor.fetchall()
-for row in results:
-    print(f"ShowNumber: {row[0]}")
-    print(f"AirDate: {row[1]}")
-    print(f"Round: {row[2]}")
-    print(f"Category: {row[3]}")
-    print(f"Value: {row[4]}")
-    print(f"Question: {row[5]}")
-    print(f"Answer: {row[6]}")
-    print("---")
+# Read CSV file and insert data into table
+with open('../data/test/mock_data.csv', 'r', newline='') as csvfile:
+    reader = csv.DictReader(csvfile)
 
-# Close the connection
+    # Insert data
+    for row in reader:
+        cursor.execute('''
+            INSERT INTO jeopardy (ShowNumber, AirDate, Round, Category, Value, Question, Answer, MockHumanAnswer)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (row['ShowNumber'], row['AirDate'], row['Round'], row['Category'], row['Value'], row['Question'], row['Answer'], row['MockHumanAnswer']))
+
+# Commit changes and close connection
+conn.commit()
 conn.close()
 
-print("Query executed successfully.")
+print("CSV data imported successfully.")
