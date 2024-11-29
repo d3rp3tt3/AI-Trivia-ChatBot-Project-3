@@ -30,7 +30,8 @@ class QuizChatbot:
 
         # Initialize LLM for fallback responses
         self.fallback_llm = ChatOllama(
-            model="phi3:3.8b",
+            # model="phi3:3.8b",
+            model="mistral:7b-instruct",
             temperature=0.7  # Higher temperature for more varied responses
         )
 
