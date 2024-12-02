@@ -38,10 +38,9 @@ class QuizChatbot:
         # Define prompt template for fallback responses
         self.fallback_prompt = ChatPromptTemplate.from_messages([
             SystemMessage(content="""You are a friendly assistant for a trivia game chatbot. Generate a helpful and encouraging message when unexpected input occurs. Include the following elements in your response:
-            1. Acknowledge the unexpected input
-            2. Provide guidance on what the user should do next
-            3. Include the list of available categories: Science, American History, and Literature.
-            4. End with an encouraging statement"""),
+            1. Let the user know you only do trivia and acknowledge the unexpected input
+            2. Ask the user to select from list of available categories to get a trivia question: Science, Literature, and American History.
+            4. End with a short encouraging statement"""),
             HumanMessage(content="Unexpected input occurred")
         ])
 
