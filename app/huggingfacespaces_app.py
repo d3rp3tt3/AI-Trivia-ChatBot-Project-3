@@ -2,6 +2,7 @@ import gradio as gr
 import pandas as pd
 from langchain_ollama import ChatOllama
 from langchain.prompts import ChatPromptTemplate
+from langchain_core.prompts import PromptTemplate
 from langchain.schema import HumanMessage, SystemMessage
 import random
 import sqlite3
@@ -10,6 +11,7 @@ from getpass import getpass
 import os
 from langchain_huggingface import HuggingFaceEndpoint
 from langchain_mistralai import ChatMistralAI
+from langchain_core.output_parsers import StrOutputParser
 
 class QuizChatbot:
     def __init__(self, db_path: str):
@@ -26,64 +28,24 @@ class QuizChatbot:
         self.categories = self.df['Category'].unique().tolist()
 		
         #if "MISTRAL_API_KEY" not in os.environ:
-        api_key = os.getenv("MISTRAL_API_KEY")
-        os.environ["MISTRAL_API_KEY"] = api_key 
+        #api_key = os.getenv("MISTRAL_API_KEY")
+        #os.environ["MISTRAL_API_KEY"] = api_key 
             
         # Initialize the Ollama model for question answering
-        #self.llm = ChatOllama(
-        #    model="phi3:3.8b",
-        #    temperature=0.7
-        #)
-
-        self.llm = ChatMistralAI(
-            model="mistral-large-latest",
+        self.llm = HuggingFaceEndpoint(
+            repo_id="mistralai/Mistral-7B-Instruct-v0.3",
+            max_new_tokens=256,
             temperature=0.7,
-            max_retries=2,
-            # other params...
+            token = os.getenv("UNCProjectToken")
         )
-
+        
         # Initialize LLM for fallback responses
-        #self.fallback_llm = ChatOllama(
-        #    model="qwen2.5:3b",
-        #    temperature=1  # Higher temperature for more varied responses
-        #)
-
-        self.fallback_llm = ChatMistralAI(
-            model="mistral-large-latest",
-            temperature=1,  # Higher temperature for more varied responses
-            max_retries=2,
-            # other params...
+        self.fallback_llm = HuggingFaceEndpoint(
+            repo_id="mistralai/Mistral-7B-Instruct-v0.3",
+            max_new_tokens=256,
+            temperature=1,
+            token = os.getenv("UNCProjectToken")
         )
-			
-		# Define prompt template for fallback responses
-        #self.fallback_prompt = ChatPromptTemplate.from_messages([
-        #    SystemMessage(content="""You are a friendly and succinct 
-        #    assistant for a trivia game chatbot. 
-        #    Generate a helpful and encouraging message when 
-        #    unexpected input occurs. Include the following elements 
-        #    in your response:
-        #    1. Let the user know you don't understand
-        #    2. Write the user a short poem
-        #    3. Tell the user to select a category to play the game
-        #    4. End with an encouraging statement
-        #    Keep the message no longer than 4 sentences.
-        #    """),
-        #    HumanMessage(content="Unexpected input occurred")
-        #])
-
-        # Define prompt template for fallback responses
-        fallback_prompt = [
-            (
-                "system",
-                """You are a friendly assistant for a trivia game chatbot. Generate a helpful and encouraging message when unexpected input occurs. Include the following elements in your response:
-                1. Acknowledge the unexpected input
-                2. Provide guidance on what the user should do next
-                3. Include the list of available categories: {categories}
-                4. End with an encouraging statement."""),
-            (
-                "human", 
-                "Unexpected input occurred"),
-        ]
 
         # Initialize state variables
         self.current_question = None
@@ -104,8 +66,7 @@ class QuizChatbot:
 
     def verify_answer(self, user_answer: str, correct_answer: str) -> dict:
         """Use the LLM to verify if the answer is correct or close"""
-        prompt = ChatPromptTemplate.from_messages([
-            SystemMessage(content="""You are a trivia gameshow host for a question and answer style trivia game. 
+        system_message = """You are a trivia gameshow host for a question and answer style trivia game. 
             Compare the user's answer with the correct answer and determine if they are:
             1. Exact match
             2. Close match (semantically similar but not identical, and this can include typos or a partial match)
@@ -114,81 +75,84 @@ class QuizChatbot:
             Return one of the following strings:
             'exact_match'
             'close_match'
-            'not_a_match'."""),
-            HumanMessage(content=f"""
-            Correct answer: {correct_answer}
-            User's answer: {user_answer}
-            How do these answers compare?
-            """)
-        ])
-
-        #response = self.llm.invoke(prompt.format_messages())
-        #return 'true' in response.content.lower()
-
-        """Use the LLM to verify if the answer is correct or close"""
-        messages = [
+            'not_a_match'."""
+        
+        user_text = f"""Correct answer: {correct_answer} User's answer: {user_answer} How do these answers compare? """
+        
+        prompt = PromptTemplate.from_template(
             (
-                "system",
-                """You are a trivia gameshow host for a question and answer style trivia game.
-                Compare the user's answer with the correct answer and determine if they are:
-                1. Exact match
-                2. Close match (semantically similar but not identical, and this can include typos or a partial match)
-                3. Not a match
+                "[INST] {system_message}"
+                "\nUser: {user_text}.\n [/INST]"
+            )
+        )
+
+        chat = prompt | self.llm.bind(skip_prompt=True) | StrOutputParser(output_key='content')
     
-                Return one of the following strings:
-                'exact_match'
-                'close_match'
-                'not_a_match'."""),
-            (
-                "human", 
-                "Correct answer: {correct_answer} User's answer: {user_answer} How do these answers compare?"),
-        ]
-
-        #try:
-        response = self.llm.invoke(messages)
-        comparison_result = response.content.strip().lower()
-        print(f"{comparison_result}")
+        # Generate the response
+        response = chat.invoke(input=dict(system_message=system_message, user_text=user_text))
+        
+        comparison_result = response #.content.strip().lower()
+        
         return {
             'result': comparison_result,
             'user_answer': user_answer,
             'correct_answer': correct_answer
             }
-        #except Exception:
-            #return {
-            #    'result': Exception,
-            #    'user_answer': user_answer,
-            #    'correct_answer': correct_answer
-            #    }
-
+        
     def get_additional_info(self, question: str) -> str:
         """Generate additional information about the topic of the question"""
-        prompt = ChatPromptTemplate.from_messages([
-            SystemMessage(content="""You are an informative assistant for a trivia game. Given a question, generate a short paragraph (about 50-75 words) providing interesting facts or background information related to the topic of the question. Avoid repeating any information directly from the question itself."""),
-            HumanMessage(content=f"Question: {question}")
-        ])
+        #prompt = ChatPromptTemplate.from_messages([
+        #    SystemMessage(content="""You are an informative assistant for a trivia game. Given a question, generate a short paragraph (about 50-75 words) providing interesting facts or background information related to the topic of the question. Avoid repeating any information directly from the question itself."""),
+        #    HumanMessage(content=f"Question: {question}")
+        #])
 
-        #response = self.llm.invoke(prompt.format_messages())
-        #return response.content.strip()
-        messages = [
+        system_message = "You are an informative assistant for a trivia game. Given a question, generate a short paragraph (about 50-75 words) providing interesting facts or background information related to the topic of the question. Avoid repeating any information directly from the question itself."
+        user_text = f"Question: {question}"
+                
+        prompt = PromptTemplate.from_template(
             (
-                "system",
-                """You are an informative assistant for a trivia game. Given a question, generate a short paragraph (about 50-75 words) providing interesting facts or background information related to the topic of the question. Avoid repeating any information directly from the question itself."""),
-            (
-                "human", 
-                "Question: {question}"),
-        ]
+                "[INST] {system_message}"
+                "\nUser: {user_text}.\n [/INST]"
+            )
+        )
+        
+        chat = prompt | self.llm.bind(skip_prompt=True) | StrOutputParser(output_key='content')
+
+        # Generate the response
+        response = chat.invoke(input=dict(system_message=system_message, user_text=user_text))
+
+        return response
         
 def friendly_fallback_response(chatbot_instance):
     """
     Generate a friendly fallback response using an LLM.
-    """    
-    try:
-        prompt = chatbot_instance.fallback_prompt #.format_messages()
-        response = chatbot_instance.fallback_llm.invoke(prompt)
-        return f"{response.content}\n\nAvailable categories:\n{chatbot_instance.get_categories()}"        
+    """   
+    # Define prompt template for fallback responses
+    system_message = """You are a friendly and succinct assistant for a trivia game chatbot. 
+    Generate a helpful and encouraging message when unexpected input occurs. Include the following elements in your response:
+    1. Let the user know you don't understand
+    2. Write the user a short poem
+    3. Tell the user to select a category to play the game
+    4. End with an encouraging statement
+    Keep the message no longer than 4 sentences."""
+
+    user_text = f"Unexpected input occurred. {chatbot_instance.current_answer}"
+
+    prompt = PromptTemplate.from_template(
+        (
+            "[INST] {system_message}"
+            "\nUser: {user_text}.\n [/INST]"
+            )
+        )
+    
+    try:               
+        chat = prompt | chatbot_instance.fallback_llm.bind(skip_prompt=True) | StrOutputParser(output_key='content')
+
+        # Generate the response
+        response = chat.invoke(input=dict(system_message=system_message, user_text=user_text))
+        return f"{response}\n\nAvailable categories:\n{chatbot_instance.get_categories()}"        
     except Exception as e:
-        # Fallback to static message if LLM fails
-        print(f"Error generating fallback response: {str(e)}")        
+        # Fallback to static message if LLM fails        
         return """Oops! Looks like something went wrong 😅. Don't worry, I'm here to help!
         Would you like to try again? Here are the available categories:
         {}
@@ -229,14 +193,14 @@ def chat(message, history, chatbot_instance):
         # If there is a current question, treat the input as an answer
         else:
             verification_result = chatbot_instance.verify_answer(message, chatbot_instance.current_answer)
-
+            
             if verification_result['result'] == 'exact_match':
                 response = "🎉 Correct! Well done!"
             elif verification_result['result'] == 'close_match':
                 response = f"""Close! Your answer '{verification_result['user_answer']}' was very good, but the exact answer was '{
                     verification_result['correct_answer']}'. Great job!"""
             else:
-                response = f"""{verification_result['result']}Sorry, that wasn't quite right. The correct answer was: {verification_result['correct_answer']}"""
+                response = f"""Sorry, that wasn't quite right. The correct answer was: {verification_result['correct_answer']}"""
 
             additional_info = chatbot_instance.get_additional_info(
                 chatbot_instance.current_question)
@@ -249,6 +213,7 @@ def chat(message, history, chatbot_instance):
 
     except Exception as e:
         return friendly_fallback_response(chatbot_instance)
+        #return f"Error:{e}"
 
 
 def create_chatbot_interface():
