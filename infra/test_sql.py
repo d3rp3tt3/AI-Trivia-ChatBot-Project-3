@@ -15,15 +15,12 @@ cursor.execute('''
         Value int,
         Question TEXT,
         Answer TEXT,
-        MockHumanAnswer TEXT,
-        MockHumanAnswer TEXT
-        Answer TEXT,
         MockHumanAnswer TEXT
     )
 ''')
 
 # Read CSV file and insert data into table
-with open('../data/test/mock_data.csv', 'r', newline='') as csvfile:
+with open('../data/test/mock_data.csv', 'r', newline='', encoding='utf-8') as csvfile:
     reader = csv.DictReader(csvfile)
 
     # Insert data

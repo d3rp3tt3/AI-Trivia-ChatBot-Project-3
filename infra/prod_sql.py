@@ -19,7 +19,7 @@ cursor.execute('''
 ''')
 
 # Read CSV file and insert data into table
-with open('../data/prod/JEOPARDY_CSV_TOP3_Categories.csv', 'r', newline='') as csvfile:
+with open('../data/prod/JEOPARDY_CSV_TOP3_Categories.csv', 'r', newline='', encoding='utf-8') as csvfile:
     reader = csv.DictReader(csvfile)
 
     # Insert data

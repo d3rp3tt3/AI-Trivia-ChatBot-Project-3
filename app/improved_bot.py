@@ -38,10 +38,9 @@ class QuizChatbot:
         # Define prompt template for fallback responses
         self.fallback_prompt = ChatPromptTemplate.from_messages([
             SystemMessage(content="""You are a friendly assistant for a trivia game chatbot. Generate a helpful and encouraging message when unexpected input occurs. Include the following elements in your response:
-            1. Acknowledge the unexpected input
-            2. Provide guidance on what the user should do next
-            3. Include the list of available categories: {categories}
-            4. End with an encouraging statement"""),
+            1. Let the user know you only do trivia and acknowledge the unexpected input
+            2. Ask the user to select from list of available categories to get a trivia question: Science, Literature, and American History.
+            4. End with a short encouraging statement"""),
             HumanMessage(content="Unexpected input occurred")
         ])
 
@@ -117,10 +116,8 @@ def friendly_fallback_response(chatbot_instance):
         print(f"Error generating fallback response: {str(e)}")
         return """Oops! Looks like something went wrong 😅. Don't worry, I'm here to help!
 
-Would you like to try again? Here are the available categories:
-
-{}
-Type a number to select a category, or ask me anything else you'd like to know!""".format(chatbot_instance.get_categories())
+Would you like to try again? Here are the available categories: Science, Literature, and American History.
+Type a number to select a category.""".format(chatbot_instance.get_categories())
 
 
 def chat(message, history, chatbot_instance):
@@ -130,29 +127,33 @@ def chat(message, history, chatbot_instance):
     # Initial greeting - this will show when the interface first loads
     if not history:
         categories = chatbot_instance.get_categories()
-        return f"Welcome to the Quiz Game! 🎮\n\nPlease select a category by entering its number:\n\n{categories}"
+        return f"Welcome to the cUrioBot Trivia! 🎮\n\nPlease select a category by entering its number or typing its name:\n\n{categories}"
 
     try:
         # If there's no current question, treat the input as category selection
         if chatbot_instance.current_question is None:
+            # Check if the input is a number
             try:
                 category_num = int(message)
                 if 1 <= category_num <= len(chatbot_instance.categories):
                     selected_category = chatbot_instance.categories[category_num - 1]
-                    question, answer = chatbot_instance.select_question(
-                        selected_category)
-
-                    if question is None:
-                        return friendly_fallback_response(chatbot_instance)
-
-                    chatbot_instance.current_question = question
-                    chatbot_instance.current_answer = answer
-
-                    return f"Category: {selected_category}\n\nQuestion: {question}"
                 else:
                     return friendly_fallback_response(chatbot_instance)
             except ValueError:
+                # If not a number, treat it as a category name
+                selected_category = next((cat for cat in chatbot_instance.categories if cat.lower() == message.lower()), None)
+                if selected_category is None:
+                    return friendly_fallback_response(chatbot_instance)
+
+            question, answer = chatbot_instance.select_question(selected_category)
+
+            if question is None:
                 return friendly_fallback_response(chatbot_instance)
+
+            chatbot_instance.current_question = question
+            chatbot_instance.current_answer = answer
+
+            return f"Category: {selected_category}\n\nQuestion: {question}"
 
         # If there is a current question, treat the input as an answer
         else:
@@ -181,12 +182,18 @@ def chat(message, history, chatbot_instance):
         return friendly_fallback_response(chatbot_instance)
 
 
+
 def create_chatbot_interface():
+    """Creates a Gradio interface for the quiz chatbot.
+
+    Returns:
+        iface: Gradio interface
+    """
     chatbot_instance = QuizChatbot("trivia_qa.db")
 
     iface = gr.ChatInterface(
         fn=lambda message, history: chat(message, history, chatbot_instance),
-        title="🎯 Trivia Quiz Game",
+        title="🎯 cUrioBot Trivia",
         description="Test your knowledge with trivia questions! Select a category and answer questions.",
         examples=[{"text": "Start game"}],
         theme="soft",
@@ -195,7 +202,7 @@ def create_chatbot_interface():
             bubble_full_width=False,
         ),
         textbox=gr.Textbox(
-            placeholder="Enter category number or your answer",
+            placeholder="Enter category number or name",
             container=False,
             scale=7
         ),
