@@ -70,6 +70,8 @@ class QuizChatbot:
             2. Close match (semantically similar but not identical, and this can include typos or a partial match)
             3. Not a match
 
+            Capitalization and punctuation should be ignored.
+
             Return one of the following strings:
             'exact_match'
             'close_match'
