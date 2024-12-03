@@ -216,4 +216,4 @@ def create_chatbot_interface():
 # Launch the interface
 if __name__ == "__main__":
     iface = create_chatbot_interface()
-    iface.launch(share=True)
+    iface.launch()
