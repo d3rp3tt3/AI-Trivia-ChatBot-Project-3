@@ -1,12 +1,16 @@
 # AI Trivia Chatbot - UNC Bootcamp Project 3
 
-[add bot screenshot]
+[Try cUrioBot on HuggingFace Spaces](https://huggingface.co/spaces/JackKuppuswamy/cUrioBot)
 
 cUrioBot is a chatbot for playing a trivia game based on a set list of questions and answers. Using retrieval-augmented-generation (RAG) with a pre-trained LLM, the AI agents interact with the user to assess the answer’s level of correctness, to handle fallback and exception messages, and to generate facts based on a question’s topic.
 
 This app can run locally without any external API calls or other external dependencies. We have also enabled it to run on HuggingFace Spaces.
 
-## Installation
+<img width="673" alt="Screenshot 2024-12-02 at 6 17 01 PM" src="https://github.com/user-attachments/assets/c63508db-c122-4f09-90d7-d10498b25586">
+
+<img width="673" alt="Screenshot 2024-12-02 at 6 17 14 PM" src="https://github.com/user-attachments/assets/b4e49bdf-8be6-429e-a467-c2b1f2814035">
+
+## Run cUrioBot
 
 This project depends on these technologies and modules:
 
@@ -89,7 +93,7 @@ cUrioBot is designed to work entirely locally without using external API request
 
 cUrioBot is written in Python.
 
-[add architecture diagram]
+<img width="468" alt="Screenshot 2024-12-01 at 5 33 28 PM" src="https://github.com/user-attachments/assets/a8c8aa93-1015-41cf-a6ab-ffb6df8fd944">
 
 ### Datastore
 
@@ -102,7 +106,7 @@ The prod database is `/app/trivia_qa.db` and the test database is `/app/testing_
 
 ### Workflow
 
-[add workflow diagram]
+![app_workflow_curio](https://github.com/user-attachments/assets/7079cd98-9854-4fe9-914c-58693365477e)
 
 ### Testing
 
