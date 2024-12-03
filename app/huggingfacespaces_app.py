@@ -174,22 +174,24 @@ def chat(message, history, chatbot_instance):
                 category_num = int(message)
                 if 1 <= category_num <= len(chatbot_instance.categories):
                     selected_category = chatbot_instance.categories[category_num - 1]
-                    question, answer = chatbot_instance.select_question(
-                        selected_category)
-
-                    if question is None:
-                        return friendly_fallback_response(chatbot_instance)
-                        
-                    chatbot_instance.current_question = question
-                    chatbot_instance.current_answer = answer
-
-                    return f"Category: {selected_category}\n\nQuestion: {question}"
                 else:
                     return friendly_fallback_response(chatbot_instance)
-                    
             except ValueError:
+                # If not a number, treat it as a category name
+                selected_category = next((cat for cat in chatbot_instance.categories if cat.lower() == message.lower()), None)
+                if selected_category is None:
+                    return friendly_fallback_response(chatbot_instance)
+                    
+            question, answer = chatbot_instance.select_question(selected_category)
+
+            if question is None:
                 return friendly_fallback_response(chatbot_instance)
-                
+                        
+            chatbot_instance.current_question = question
+            chatbot_instance.current_answer = answer
+
+            return f"Category: {selected_category}\n\nQuestion: {question}"
+                            
         # If there is a current question, treat the input as an answer
         else:
             verification_result = chatbot_instance.verify_answer(message, chatbot_instance.current_answer)
@@ -213,8 +215,7 @@ def chat(message, history, chatbot_instance):
 
     except Exception as e:
         return friendly_fallback_response(chatbot_instance)
-        #return f"Error:{e}"
-
+        
 
 def create_chatbot_interface():
     chatbot_instance = QuizChatbot("trivia_qa.db")
