@@ -4,3 +4,10 @@ langchain
 huggingface_hub
 langchain_huggingface
 langchain_mistralai
+transformers
+langchain_core
+langchain_community
+langchain_text_splitters
+accelerate
+watchdog
+tqdm
