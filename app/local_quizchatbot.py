@@ -70,6 +70,8 @@ class QuizChatbot:
             2. Close match (semantically similar but not identical, and this can include typos or a partial match)
             3. Not a match
 
+            Capitalization and punctuation should be ignored.
+
             Return one of the following strings:
             'exact_match'
             'close_match'
@@ -214,4 +216,4 @@ def create_chatbot_interface():
 # Launch the interface
 if __name__ == "__main__":
     iface = create_chatbot_interface()
-    iface.launch()
+    iface.launch(share=True)
