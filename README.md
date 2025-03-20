@@ -1,4 +1,4 @@
-# AI Trivia Chatbot - UNC Bootcamp Project 3
+# cUrioBot: An AI Trivia Chatbot
 
 [Try cUrioBot on HuggingFace Spaces](https://huggingface.co/spaces/JackKuppuswamy/cUrioBot)
 
